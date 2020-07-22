@@ -10,6 +10,7 @@ namespace Brotzka\DotenvEditor;
 
 use Brotzka\DotenvEditor\Exceptions\DotEnvException;
 use Dotenv\Exception\InvalidPathException;
+use Illuminate\Support\Str;
 
 class DotenvEditor
 {
@@ -30,8 +31,8 @@ class DotenvEditor
      */
     public function __construct()
     {
-        $backupPath      = str_finish(config('dotenveditor.backupPath'), '/');
-        $env             = config('dotenveditor.pathToEnv');
+        $backupPath = Str::finish(config('dotenveditor.backupPath'), '/');
+        $env = config('dotenveditor.pathToEnv');
         $filePermissions = config('dotenveditor.filePermissions');
 
         if (!file_exists($env)) {
@@ -177,7 +178,7 @@ class DotenvEditor
      */
     protected function getLatestBackup()
     {
-        $backups      = $this->getBackupVersions();
+        $backups = $this->getBackupVersions();
         $latestBackup = 0;
         foreach ($backups as $backup) {
             if ($backup > $latestBackup) {
@@ -243,10 +244,10 @@ class DotenvEditor
 
         if (count($versions) > 0) {
             $output = array();
-            $count  = 0;
+            $count = 0;
             foreach ($versions as $version) {
-                $part                          = explode("_", $version);
-                $output[$count]['formatted']   = date("Y-m-d H:i:s", (int) $part[0]);
+                $part = explode("_", $version);
+                $output[$count]['formatted'] = date("Y-m-d H:i:s", (int)$part[0]);
                 $output[$count]['unformatted'] = $part[0];
                 $count++;
             }
@@ -324,15 +325,15 @@ class DotenvEditor
      */
     protected function envToArray($file)
     {
-        $string      = file_get_contents($file);
-        $string      = preg_split('/\n+/', $string);
+        $string = file_get_contents($file);
+        $string = preg_split('/\n+/', $string);
         $returnArray = array();
 
         foreach ($string as $one) {
             if (preg_match('/^(#\s)/', $one) === 1 || preg_match('/^([\\n\\r]+)/', $one)) {
                 continue;
             }
-            $entry                  = explode("=", $one, 2);
+            $entry = explode("=", $one, 2);
             $returnArray[$entry[0]] = isset($entry[1]) ? $entry[1] : null;
         }
 
@@ -368,10 +369,10 @@ class DotenvEditor
     private function envToJson($file = [])
     {
         $array = [];
-        $c     = 0;
+        $c = 0;
         foreach ($file as $key => $value) {
-            $array[$c]        = new \stdClass();
-            $array[$c]->key   = $key;
+            $array[$c] = new \stdClass();
+            $array[$c]->key = $key;
             $array[$c]->value = $value;
             $c++;
         }
@@ -398,7 +399,7 @@ class DotenvEditor
     {
         if (is_array($array)) {
             $newArray = array();
-            $c        = 0;
+            $c = 0;
             foreach ($array as $key => $value) {
                 if (preg_match('/\s/', $value) > 0 && (strpos($value, '"') > 0 && strpos($value, '"', -0) > 0)) {
                     $value = '"' . $value . '"';
@@ -501,28 +502,28 @@ class DotenvEditor
     /**
      * [isStartOrEndWith description]
      *
-     * @param string $value  value
+     * @param string $value value
      * @param string $string check string
      *
      * @return boolean
      */
     public function isStartOrEndWith($value, $string = '')
     {
-        return starts_with($value, $string) || ends_with($value, $string);
+        return Str::startsWith($value, $string) || Str::endsWith($value, $string);
     }
 
     /**
      * [setStartAndEndWith description]
      *
-     * @param string $value  value
+     * @param string $value value
      * @param string $string check string
      *
      * @return string value
      */
     public function setStartAndEndWith($value, $string = '')
     {
-        $value = str_start($value, '"');
-        $value = str_finish($value, '"');
+        $value = Str::start($value, '"');
+        $value = Str::finish($value, '"');
         return $value;
     }
 
